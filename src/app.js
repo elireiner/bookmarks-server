@@ -4,8 +4,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
-//winston is a logger
-const winston = require('winston');
+const logger = require('./logger')
+const bookmarkList = require('./bookmarks/bookmarks-router')
 
 const app = express()
 
@@ -17,22 +17,6 @@ app.use(morgan(morganOption))
 app.use(express.json())
 app.use(helmet())
 app.use(cors())
-
-// set up winston
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.File({ filename: 'info.log' })
-    ]
-});
-
-// continue winston set up to log to console when in development
-if (NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.simple()
-    }));
-}
 
 app.use(function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN
@@ -50,6 +34,8 @@ app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
 
+app.use(bookmarkList)
+
 app.use(function errorHandler(error, req, res, next) {
     let response
     if (NODE_ENV === 'production') {
@@ -61,4 +47,4 @@ app.use(function errorHandler(error, req, res, next) {
     res.status(500).json(response)
 })
 
-module.exports = app
+module.exports = app;
