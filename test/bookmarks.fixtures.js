@@ -74,7 +74,7 @@ function makeBookmarksArry() {
 };
 function makeMaliciousBookmark() {
     const maliciousBookmark = {
-      
+        id: 1,
         url: 'Donec semper sapien a libero.',
         rating: 1,
         title: 'Naughty naughty very naughty <script>alert("xss");</script>',
