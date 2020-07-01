@@ -155,23 +155,50 @@ describe('bookmarks app', () => {
 
         })
 
-        const requiredFields = ['title', 'url', 'description'];
-        requiredFields.forEach(field => {
-            const newBookmark = {
-                title: 'Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.',
-                url: 'Donec semper sapien a libero.',
-                description: 'Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis.',
-                rating: '1'
-            }
+        context('Given a missing or incorrect field value', () => {
+            const requiredFields = ['title', 'url', 'description'];
+            requiredFields.forEach(field => {
+                const newBookmark = {
+                    title: 'Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.',
+                    url: 'Donec semper sapien a libero.',
+                    description: 'Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis.',
+                    rating: '1'
+                }
 
-            it(`responds with an error when ${field} is missing`, () => {
-                delete newBookmark[field];
-                return supertest(app)
-                    .post('/bookmarks')
-                    .send(newBookmark)
-                    .expect(400, {
-                        error: { message: `Missing '${field}' in request body` }
-                    })
+                it(`responds with an error when ${field} is missing`, () => {
+                    delete newBookmark[field];
+                    return supertest(app)
+                        .post('/bookmarks')
+                        .send(newBookmark)
+                        .expect(400, {
+                            error: { message: `Missing '${field}' in request body` }
+                        })
+                })
+            })
+
+            it(`responds with an error when 'rating' is not in the rage of 1 to 5`, () => {
+                let array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,]
+                array.forEach(num => {
+                    const newBookmark = {
+                        title: 'Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.',
+                        url: 'Donec semper sapien a libero.',
+                        description: 'Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis.',
+                        rating: `${num}`
+                    }
+
+                    if (num = 0 || num > 5) {
+                        return supertest(app)
+                            .post('/bookmarks')
+                            .send(newBookmark)
+                            .expect(400, {
+                                error: { message: `Rating must be a number between 1 and 5` }
+                            })
+
+                    }
+                })
+
+
+
             })
         })
 
