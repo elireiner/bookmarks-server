@@ -1,11 +1,12 @@
 const express = require('express');
+const path = require('path')
 const logger = require('../logger');
 const xss = require('xss')
-const BookmarkService = require('../bookmark-service');
+const BookmarkService = require('./bookmark-service');
 const Knex = require('knex');
 
 const bookmarksRouter = express.Router();
-const bodyParser = express.json()
+const jsonParser = express.json()
 
 let sanitize = bookmark => ({
     id: bookmark.id,
@@ -25,7 +26,7 @@ bookmarksRouter
             })
             .catch(next)
     })
-    .post(bodyParser, (req, res, next) => {
+    .post(jsonParser, (req, res, next) => {
         const { title, url, description, rating = 1 } = req.body;
         const newBookmark = { title, url, description, rating }
 
@@ -57,16 +58,27 @@ bookmarksRouter
 
 bookmarksRouter
     .route('/bookmarks/:bookmark_id')
+    .all((req, res, next) => {
+        const { bookmark_id } = req.params;
+        BookmarkService.getBookmarkById(
+            req.app.get('db'),
+            bookmark_id
+        )
+        .then(bookmark => {
+            if (!bookmark) {
+                return res.status(404).json({
+                    error: { message: 'resource not found' }
+                })
+            }
+            next()
+        })
+        .catch(next)
+    })
     .get((req, res, next) => {
 
         const knexInstance = req.app.get('db')
         BookmarkService.getBookmarkById(knexInstance, req.params.bookmark_id)
             .then(bookmark => {
-                if (!bookmark) {
-                    return res.status(404).json({
-                        error: { message: 'resource not found' }
-                    })
-                }
                 res.json(sanitize(bookmark))
             })
 
@@ -74,26 +86,21 @@ bookmarksRouter
     })
 
     .delete((req, res, next) => {
-        const { id } = req.params;
-
-        const bookmarkIndex = bookmarkList.findIndex(el => el.id == id)
-
-        if (bookmarkIndex === -1) {
-            logger.error(`List with id ${id} not found.`);
-            return res.status(404).send('No such bookmark')
-        }
-
+        const { bookmark_id } = req.params;
         BookmarkService.deleteBookmark(
             req.app.get('db'),
-            id
+            bookmark_id
         )
 
         .then(numRowsAffected => {
-            logger.info(`Bookmark with id ${id} deleted.`)
+            logger.info(`Bookmark with id ${bookmark_id} deleted.`)
             res.status(204).end()
           })
           .catch(next)
 
     })
+   /* .patch(jsonParser, (req, res, next) => {
+        res.status(204).end()
+    })*/
 
 module.exports = bookmarksRouter;
