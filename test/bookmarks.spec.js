@@ -255,7 +255,7 @@ describe('bookmarks app', () => {
         })
     })
 
-    describe('PATCH /api/bookmarks', () => {
+    describe.skip('PATCH /api/bookmarks', () => {
         context('when there are no bookmarks in the db', () => {
             it('returns 404', () => {
                 const idToUpdate = 1234
