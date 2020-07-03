@@ -17,7 +17,7 @@ let sanitize = bookmark => ({
 })
 
 bookmarksRouter
-    .route('/bookmarks')
+    .route('/')
     .get((req, res, next) => {
         const knexInstance = req.app.get('db');
         BookmarkService.getAllBookmarks(knexInstance)
@@ -57,7 +57,7 @@ bookmarksRouter
     })
 
 bookmarksRouter
-    .route('/bookmarks/:bookmark_id')
+    .route('/:bookmark_id')
     .all((req, res, next) => {
         const { bookmark_id } = req.params;
         BookmarkService.getBookmarkById(
@@ -99,8 +99,8 @@ bookmarksRouter
           .catch(next)
 
     })
-   /* .patch(jsonParser, (req, res, next) => {
+   .patch(jsonParser, (req, res, next) => {
         res.status(204).end()
-    })*/
+    })
 
 module.exports = bookmarksRouter;
