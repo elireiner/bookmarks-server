@@ -2,7 +2,7 @@
 
 This is a server side repo for the bookmarks-client!
 
-This will handle requests for GET, POST and DELETE.
+This will handle requests for GET, POST, DELETE and PATCH.
 
 ## Scripts
 
