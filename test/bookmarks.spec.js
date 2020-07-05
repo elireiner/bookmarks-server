@@ -274,6 +274,21 @@ describe('bookmarks app', () => {
                     .insert(testBookmarks)
             })
 
+            it('Responds with error when there is no bookmark id in the URL', () => {
+                    const updatedBookmark = {
+                    title: 'Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.',
+                    url: 'Donec semper sapien a libero.',
+                    description: 'Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis.',
+                    rating: '1'
+                }
+
+                return supertest(app)
+                .patch(`/api/bookmarks`)
+                .send(updatedBookmark)
+                .expect(404)
+
+            })
+
             it('updates the bookmark correctly', () => {
                 const idToUpdate = 2
 
