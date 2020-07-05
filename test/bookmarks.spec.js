@@ -255,13 +255,13 @@ describe('bookmarks app', () => {
         })
     })
 
-    describe.skip('PATCH /api/bookmarks', () => {
+    describe('PATCH /api/bookmarks', () => {
         context('when there are no bookmarks in the db', () => {
             it('returns 404', () => {
                 const idToUpdate = 1234
                 return supertest(app)
-                .patch(`/api/bookmarks/${idToUpdate}`)
-                .expect(404)
+                    .patch(`/api/bookmarks/${idToUpdate}`)
+                    .expect(404)
             })
         })
 
@@ -276,7 +276,7 @@ describe('bookmarks app', () => {
 
             it('updates the bookmark correctly', () => {
                 const idToUpdate = 2
-    
+
                 const updatedBookmark = {
                     title: 'Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.',
                     url: 'Donec semper sapien a libero.',
@@ -294,7 +294,51 @@ describe('bookmarks app', () => {
                     .patch(`/api/bookmarks/${idToUpdate}`)
                     .send(updatedBookmark)
                     .expect(204)
+                    .then(res =>
+                        supertest(app)
+                            .get(`/api/bookmarks/${idToUpdate}`)
+                            .expect(expectedBookmark)
+                    )
 
+            })
+
+            it('responsd with 400 when no required field are sent', () => {
+                const idToUpdate = 2
+                const testBookmark = {
+                    nonRequiredField: 'nothing and nothing'
+                }
+
+                return supertest(app)
+                    .patch(`/api/bookmarks/${idToUpdate}`)
+                    .send(testBookmark)
+                    .expect(400, {
+                        error: { message: `Request body must contain either 'title', 'url', 'description', or 'rating'` }
+                    })
+            })
+
+            it('Only updates required fields', () => {
+                const idToUpdate = 2
+                const updateBookmark = {
+                    title: 'updated bookmark title'
+                }
+
+                const expectBookmark = {
+                    ...testBookmarks[idToUpdate - 1],
+                    ...updateBookmark
+                }
+
+                return supertest(app)
+                    .patch(`/api/bookmarks/${idToUpdate}`)
+                    .send({
+                        ...updateBookmark,
+                        fieldToIgnore: 'ignore me'
+                    })
+                    .expect(204)
+                    .then(res =>
+                        supertest(app)
+                            .get(`/api/bookmarks/${idToUpdate}`)
+                            .expect(200, expectBookmark)
+                    )
             })
         })
     })
