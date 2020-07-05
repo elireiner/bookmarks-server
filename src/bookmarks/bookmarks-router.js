@@ -64,15 +64,15 @@ bookmarksRouter
             req.app.get('db'),
             bookmark_id
         )
-        .then(bookmark => {
-            if (!bookmark) {
-                return res.status(404).json({
-                    error: { message: 'resource not found' }
-                })
-            }
-            next()
-        })
-        .catch(next)
+            .then(bookmark => {
+                if (!bookmark) {
+                    return res.status(404).json({
+                        error: { message: 'resource not found' }
+                    })
+                }
+                next()
+            })
+            .catch(next)
     })
     .get((req, res, next) => {
 
@@ -92,15 +92,32 @@ bookmarksRouter
             bookmark_id
         )
 
-        .then(numRowsAffected => {
-            logger.info(`Bookmark with id ${bookmark_id} deleted.`)
-            res.status(204).end()
-          })
-          .catch(next)
+            .then(numRowsAffected => {
+                logger.info(`Bookmark with id ${bookmark_id} deleted.`)
+                res.status(204).end()
+            })
+            .catch(next)
 
     })
-   .patch(jsonParser, (req, res, next) => {
-        res.status(204).end()
+    .patch(jsonParser, (req, res, next) => {
+        const { title, url, description, rating } = req.body;
+        const updatedBookmark = { title, url, description, rating }
+
+        const numberOfReqFields = Object.values(updatedBookmark).filter(Boolean).length
+        if (numberOfReqFields == 0) {
+           return res.status(400).json({
+                error: { message: `Request body must contain either 'title', 'url', 'description', or 'rating'` }
+            })
+        }
+        BookmarkService.updateBookmark(
+            req.app.get('db'),
+            req.params.bookmark_id,
+            updatedBookmark
+        )
+            .then(numRowsAffected => {
+                res.status(204).end()
+            })
+            .catch(next)
     })
 
 module.exports = bookmarksRouter;
