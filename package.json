@@ -10,7 +10,7 @@
     "migrate:test": "env NODE_ENV=test npm run migrate",
     "predeploy": "npm audit",
     "deploy": "git push heroku master",
-    "test": "mocha --require test/setup.js"
+    "test": "mocha --exit --require test/setup.js"
   },
   "keywords": [],
   "author": "",
