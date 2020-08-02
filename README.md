@@ -1,8 +1,10 @@
 # Bookmarks Server!
 
-This is a server side repo for the bookmarks-client!
+Use this api to and database directly to manage you bookmarks or connect this api to a client.
 
-This will handle requests for GET, POST, DELETE and PATCH.
+You can test this api with [this client](https://github.com/elireiner/bookmark-app-master) or its [deployed version](https://build-sigma-five.vercel.app)
+
+This server handles GET, POST, DELETE and PATCH requests.
 
 ## Scripts
 
